@@ -1,0 +1,9 @@
+Package: com.axs.applekeyboardtheme
+Name: Apple Keyboard Custom Background
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Custom background for Apple Keyboard on Dopamine JB
+Maintainer: Your Name <your@email.com>
+Author: Your Name <your@email.com>
+Section: Tweaks
+Depends: firmware (>= 16.0), org.coolstar.libhooker (>= 1.6.0)
