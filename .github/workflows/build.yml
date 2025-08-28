@@ -1,0 +1,67 @@
+name: Build Apple Keyboard Theme
+
+on:
+  push:
+    branches:
+      - main
+    tags-ignore:
+      - '*'  # 忽略 tag 推送触发
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive  # 确保子模块也被检出
+
+      - name: Cache Theos
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/theos
+            ${{ github.workspace }}/theos
+          key: ${{ runner.os }}-theos-${{ hashFiles('Makefile') }}
+          
+      - name: Setup Theos
+        uses: axs66/theos-action@main
+        with:
+          theos_version: latest  # 明确指定版本
+
+      - name: Install dependencies
+        run: |
+          brew install dpkg
+          sudo gem install cocoapods  # 如果需要 CocoaPods
+
+      - name: Build packages
+        run: |
+          # 清理之前的构建
+          rm -rf packages/
+          mkdir -p packages
+          
+          # 构建不同架构的包
+          for scheme in rootless roothide; do
+            make clean
+            make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=$scheme
+            cp packages/*.deb packages/AppleKeyboardTheme_${scheme}.deb
+          done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppleKeyboardTheme-Debs
+          path: packages/*.deb
+          retention-days: 7
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'  # 只在 main 分支推送时创建 release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: AppleKeyboardTheme $(date +%Y%m%d)
+          body: |
+            Automated build of Apple Keyboard Custom Background
+            - Supports rootless and roothide
+          files: packages/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用默认 token
