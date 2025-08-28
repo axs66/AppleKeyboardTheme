@@ -1,20 +1,20 @@
-name: Build Apple Keyboard Theme
+name: Dopamine Build
 
 on:
   push:
-    branches:
-      - main
-    tags-ignore:
-      - '*'  # 忽略 tag 推送触发
+    branches: [ main ]
+    tags-ignore: [ '*' ]
 
 jobs:
   build:
-    runs-on: macos-latest
-    
+    runs-on: macos-13  # 确保使用较新的 macOS 版本
+    env:
+      THEOS_PACKAGE_SCHEME: rootless  # 专门为无根越狱配置
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          submodules: recursive  # 确保子模块也被检出
+          submodules: recursive
 
       - name: Cache Theos
         uses: actions/cache@v3
@@ -22,46 +22,34 @@ jobs:
           path: |
             ~/theos
             ${{ github.workspace }}/theos
-          key: ${{ runner.os }}-theos-${{ hashFiles('Makefile') }}
-          
-      - name: Setup Theos
+          key: dopamine-${{ runner.os }}-theos-${{ hashFiles('Makefile') }}
+
+      - name: Setup Theos for Dopamine
         uses: axs66/theos-action@main
         with:
-          theos_version: latest  # 明确指定版本
+          theos_version: v2.6  # 使用较新稳定版
+          sdk_version: 16.2    # 匹配 iOS 16.5
 
-      - name: Install dependencies
+      - name: Install dpkg for rootless
         run: |
           brew install dpkg
-          sudo gem install cocoapods  # 如果需要 CocoaPods
+          echo 'export PATH="/opt/homebrew/opt/dpkg/bin:$PATH"' >> ~/.zshrc
 
-      - name: Build packages
+      - name: Build Rootless Package
         run: |
-          # 清理之前的构建
-          rm -rf packages/
-          mkdir -p packages
-          
-          # 构建不同架构的包
-          for scheme in rootless roothide; do
-            make clean
-            make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=$scheme
-            cp packages/*.deb packages/AppleKeyboardTheme_${scheme}.deb
-          done
+          export THEOS_PACKAGE_INSTALLATION_PREFIX=/var/jb  # 多巴胺专用路径
+          make clean
+          make package FINALPACKAGE=1 \
+            THEOS_PACKAGE_SCHEME=rootless \
+            TARGET=iphone:clang:16.5:15.0  # 指定目标版本
 
-      - name: Upload artifacts
+      - name: Verify Deb Structure
+        run: |
+          dpkg -c packages/*.deb | grep "/var/jb/Library/Keyboard/Themes" ||
+            (echo "路径验证失败" && exit 1)
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AppleKeyboardTheme-Debs
+          name: Dopamine-Keyboard-Theme
           path: packages/*.deb
-          retention-days: 7
-
-      - name: Create Release
-        if: github.ref == 'refs/heads/main'  # 只在 main 分支推送时创建 release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: AppleKeyboardTheme $(date +%Y%m%d)
-          body: |
-            Automated build of Apple Keyboard Custom Background
-            - Supports rootless and roothide
-          files: packages/*.deb
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 使用默认 token
