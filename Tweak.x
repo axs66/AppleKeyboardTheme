@@ -1,21 +1,24 @@
 #import <UIKit/UIKit.h>
-#import <os/log.h>
+// 从私有框架导入头文件（需确保Theos已配置私有框架路径）
+#import <UIKit/UIKeyboardLayoutStar.h> 
+#import <UIKit/UIKeyboardImpl.h>
+
 
 %hook UIKeyboardLayoutStar
 
 - (void)didMoveToWindow {
     %orig;
     
-    @try {
-        NSString *imagePath = @"/var/jb/Library/Keyboard/Themes/CustomBackground.theme/Background.png";
-        UIImage *customImage = [UIImage imageWithContentsOfFile:imagePath];
-        
-        if (customImage && [self respondsToSelector:@selector(setBackgroundImage:)]) {
-            [self setBackgroundImage:customImage];
-            os_log_debug(OS_LOG_DEFAULT, "[KeyboardTheme] Successfully applied background");
-        }
-    } @catch (NSException *e) {
-        os_log_error(OS_LOG_DEFAULT, "[KeyboardTheme] Error: %@", e.reason);
+    // 安全类型检查
+    if (![self respondsToSelector:@selector(setBackgroundImage:)]) {
+        return;
+    }
+    
+    NSString *imagePath = @"/var/jb/Library/Keyboard/Themes/CustomBackground.theme/Background.png";
+    UIImage *customImage = [UIImage imageWithContentsOfFile:imagePath];
+    
+    if (customImage) {
+        [self setBackgroundImage:customImage]; 
     }
 }
 
