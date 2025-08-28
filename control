@@ -6,4 +6,4 @@ Description: Custom background for Apple Keyboard
 Maintainer: Axs
 Author: Axs
 Section: Tweaks
-Depends: mobilesubstrate (>= 0.9.5000)
+Depends: firmware (>= 16.0), org.coolstar.libhooker (>= 1.6.0)
