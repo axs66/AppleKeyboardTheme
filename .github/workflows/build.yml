@@ -7,9 +7,9 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13  # 确保使用较新的 macOS 版本
+    runs-on: macos-13
     env:
-      THEOS_PACKAGE_SCHEME: rootless  # 专门为无根越狱配置
+      THEOS_PACKAGE_SCHEME: rootless
 
     steps:
       - uses: actions/checkout@v4
@@ -24,32 +24,42 @@ jobs:
             ${{ github.workspace }}/theos
           key: dopamine-${{ runner.os }}-theos-${{ hashFiles('Makefile') }}
 
-      - name: Setup Theos for Dopamine
+      - name: Setup Theos
         uses: axs66/theos-action@main
         with:
-          theos_version: v2.6  # 使用较新稳定版
-          sdk_version: 16.2    # 匹配 iOS 16.5
+          theos_version: v2.6
+          sdk_version: 16.2
 
-      - name: Install dpkg for rootless
+      - name: Build Package
         run: |
-          brew install dpkg
-          echo 'export PATH="/opt/homebrew/opt/dpkg/bin:$PATH"' >> ~/.zshrc
-
-      - name: Build Rootless Package
-        run: |
-          export THEOS_PACKAGE_INSTALLATION_PREFIX=/var/jb  # 多巴胺专用路径
+          export THEOS_PACKAGE_INSTALLATION_PREFIX=/var/jb
           make clean
           make package FINALPACKAGE=1 \
             THEOS_PACKAGE_SCHEME=rootless \
-            TARGET=iphone:clang:16.5:15.0  # 指定目标版本
+            TARGET=iphone:clang:16.5:15.0
 
-      - name: Verify Deb Structure
+      - name: Verify Deb
         run: |
           dpkg -c packages/*.deb | grep "/var/jb/Library/Keyboard/Themes" ||
-            (echo "路径验证失败" && exit 1)
+            (echo "❌ 路径验证失败" && exit 1)
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Dopamine-Keyboard-Theme
           path: packages/*.deb
+          retention-days: 3
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "v$(date +%Y%m%d)"
+          body: |
+            🎨 Dopamine Keyboard Theme
+            - iOS 16.5 专用
+            - 无根越狱兼容
+          files: packages/*.deb
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
