@@ -1,0 +1,9 @@
+Package: com.axs.applekeyboardtheme
+Name: Apple Keyboard Custom Background
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Custom background for Apple Keyboard
+Maintainer: Axs
+Author: Axs
+Section: Tweaks
+Depends: mobilesubstrate (>= 0.9.5000)
