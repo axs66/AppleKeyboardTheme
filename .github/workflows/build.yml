@@ -1,65 +1,54 @@
-name: Dopamine Build
+name: CI
 
 on:
   push:
-    branches: [ main ]
-    tags-ignore: [ '*' ]
+    branches:
+      - main
+    tags-ignore:
+      - '*'  # 忽略 tag 推送触发，避免发布 release 时死循环构建
 
 jobs:
   build:
-    runs-on: macos-13
-    env:
-      THEOS_PACKAGE_SCHEME: rootless
+    runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
-          submodules: recursive
+          submodules: true
 
-      - name: Cache Theos
+      - name: Check cache
+        run: |
+          echo upstream_heads=theos_version_commit-sdks_version_commit >> $GITHUB_ENV
+
+      - name: Use cache
+        id: cache
         uses: actions/cache@v3
         with:
-          path: |
-            ~/theos
-            ${{ github.workspace }}/theos
-          key: dopamine-${{ runner.os }}-theos-${{ hashFiles('Makefile') }}
+          path: ${{ github.workspace }}/theos
+          key: ${{ runner.os }}-theos-sdk-version
 
-      - name: Setup Theos
+      - name: Prepare Theos
         uses: axs66/theos-action@main
-        with:
-          theos_version: v2.6
-          sdk_version: 16.2
 
-      - name: Build Package
+      - name: Build package
         run: |
-          export THEOS_PACKAGE_INSTALLATION_PREFIX=/var/jb
-          make clean
-          make package FINALPACKAGE=1 \
-            THEOS_PACKAGE_SCHEME=rootless \
-            TARGET=iphone:clang:16.5:15.0
+          rm -f ${{ github.workspace }}/packages/*.deb
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
 
-      - name: Verify Deb
+      - name: List generated Deb packages
+        run: ls ${{ github.workspace }}/packages
+
+      - name: Create GitHub Release
+        id: release
         run: |
-          dpkg -c packages/*.deb | grep "/var/jb/Library/Keyboard/Themes" ||
-            (echo "❌ 路径验证失败" && exit 1)
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Dopamine-Keyboard-Theme
-          path: packages/*.deb
-          retention-days: 3
-
-      - name: Create Release
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v1
-        with:
-          name: "v$(date +%Y%m%d)"
-          body: |
-            🎨 Dopamine Keyboard Theme
-            - iOS 16.5 专用
-            - 无根越狱兼容
-          files: packages/*.deb
-          draft: false
+          VERSION=$(date +v%Y%m%d%H%M)
+          gh release create $VERSION ${{ github.workspace }}/packages/*.deb --title "AppleKeyboardTheme $VERSION" --notes "Automated release of .deb files"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT }}
+
+      - name: Upload specific Deb packages
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          name: AppleKeyboardTheme
+          path: ${{ github.workspace }}/packages/*.deb
