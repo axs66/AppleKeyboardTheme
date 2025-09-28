@@ -20,6 +20,7 @@
     [self applyKeyboardColor];
 }
 
+%new
 - (void)applyKeyboardColor {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.yourcompany.keyboardcolor"];
     
@@ -31,12 +32,18 @@
     
     UIColor *keyboardColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
     
-    // 安全访问 view，避免使用 KVC
+    // 安全访问 view（KVC 包裹 try/catch），并检查类型
     UIView *controllerView = nil;
-    if ([self respondsToSelector:@selector(view)]) {
-        controllerView = ((UIViewController *)self).view;
+    @try {
+        id v = [self valueForKey:@"view"];
+        if ([v isKindOfClass:[UIView class]]) {
+            controllerView = (UIView *)v;
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"KeyboardColorTweak: view KVC failed: %@", exception);
+        return;
     }
-    if (!controllerView) {
+    if (controllerView == nil) {
         return;
     }
     
@@ -51,6 +58,7 @@
     }
 }
 
+%new
 - (void)kct_applyBackgroundColor:(UIColor *)color toView:(UIView *)view {
     for (UIView *subview in view.subviews) {
         if ([subview isKindOfClass:NSClassFromString(@"UIKBKeyView")] || 
