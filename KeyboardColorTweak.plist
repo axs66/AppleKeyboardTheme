@@ -8,6 +8,12 @@
         <array>
             <string>com.apple.UIKit</string>
             <string>com.apple.TextInput</string>
+            <string>com.apple.TextInputUI</string>
+        </array>
+        <key>Classes</key>
+        <array>
+            <string>UIInputWindowController</string>
+            <string>UIInputSetHostView</string>
         </array>
     </dict>
 </dict>
