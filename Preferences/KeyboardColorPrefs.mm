@@ -1,4 +1,5 @@
 #import "KeyboardColorPrefs.h"
+#import <UIKit/UIKit.h>
 
 @implementation KeyboardColorPrefs
 
@@ -24,6 +25,25 @@
                                                             preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    // 设置导航栏标题
+    self.title = @"键盘颜色";
+    
+    // 设置导航栏样式
+    if (@available(iOS 13.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    // 刷新设置项
+    [self reloadSpecifiers];
 }
 
 @end
