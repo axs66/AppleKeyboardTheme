@@ -33,6 +33,28 @@ jobs:
       - name: Prepare Theos
         uses: axs66/theos-action@main
 
+      - name: Install iOS SDK (with PrivateFrameworks)
+        run: |
+          set -e
+          mkdir -p "$GITHUB_WORKSPACE/theos/sdks"
+          cd "$GITHUB_WORKSPACE/theos/sdks"
+          SDK_FILE=iPhoneOS16.0.sdk.tar.xz
+          if [ ! -d "iPhoneOS16.0.sdk" ]; then
+            echo "Downloading iPhoneOS16.0 SDK..."
+            curl -L -o "$SDK_FILE" \
+              https://github.com/theos/sdks/releases/download/ios-16.0/iPhoneOS16.0.sdk.tar.xz \
+              || curl -L -o "$SDK_FILE" https://github.com/theos/sdks/releases/download/ios-16.4/iPhoneOS16.4.sdk.tar.xz \
+              || curl -L -o "$SDK_FILE" https://github.com/theos/sdks/releases/download/ios-16.5/iPhoneOS16.5.sdk.tar.xz
+            tar -xJf "$SDK_FILE" || true
+            # If we downloaded a different version, extract name may differ; normalize to 16.0 path if needed
+            for D in iPhoneOS16.*.sdk; do
+              if [ -d "$D" ] && [ "$D" != "iPhoneOS16.0.sdk" ]; then
+                ln -snf "$D" iPhoneOS16.0.sdk
+              fi
+            done
+          fi
+          ls -la
+
       - name: Build package
         run: |
           rm -f ${{ github.workspace }}/packages/*.deb
