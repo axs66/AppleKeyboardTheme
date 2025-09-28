@@ -1,6 +1,12 @@
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 
+@interface UIInputWindowController : NSObject
+- (void)viewDidLoad;
+- (void)viewDidAppear:(BOOL)animated;
+- (id)valueForKey:(NSString *)key;
+@end
+
 %hook UIInputWindowController
 
 - (void)viewDidLoad {
