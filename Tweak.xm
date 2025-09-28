@@ -6,15 +6,25 @@
 - (void)viewDidLoad {
     %orig;
     
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.yourcompany.keyboardcolor"];
-    UIColor *keyboardColor = [UIColor colorWithRed:[[defaults objectForKey:@"red"] floatValue]
-                                           green:[[defaults objectForKey:@"green"] floatValue]
-                                            blue:[[defaults objectForKey:@"blue"] floatValue]
-                                           alpha:[[defaults objectForKey:@"alpha"] floatValue]];
+    [self applyKeyboardColor];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    %orig;
     
-    if (!keyboardColor) {
-        keyboardColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
-    }
+    [self applyKeyboardColor];
+}
+
+- (void)applyKeyboardColor {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.yourcompany.keyboardcolor"];
+    
+    // 获取颜色值，如果没有设置则使用默认值
+    float red = [[defaults objectForKey:@"red"] floatValue] ?: 0.9;
+    float green = [[defaults objectForKey:@"green"] floatValue] ?: 0.9;
+    float blue = [[defaults objectForKey:@"blue"] floatValue] ?: 0.9;
+    float alpha = [[defaults objectForKey:@"alpha"] floatValue] ?: 1.0;
+    
+    UIColor *keyboardColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
     
     // 安全访问view属性
     UIView *controllerView = nil;
@@ -29,7 +39,20 @@
     for (UIView *subview in controllerView.subviews) {
         if ([subview isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
             subview.backgroundColor = keyboardColor;
+            
+            // 递归设置子视图背景色
+            [self setBackgroundColor:keyboardColor forView:subview];
         }
+    }
+}
+
+- (void)setBackgroundColor:(UIColor *)color forView:(UIView *)view {
+    for (UIView *subview in view.subviews) {
+        if ([subview isKindOfClass:NSClassFromString(@"UIKBKeyView")] || 
+            [subview isKindOfClass:NSClassFromString(@"UIKBKeyplaneView")]) {
+            subview.backgroundColor = color;
+        }
+        [self setBackgroundColor:color forView:subview];
     }
 }
 
