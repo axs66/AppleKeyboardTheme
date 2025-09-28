@@ -1,9 +1,9 @@
-Package: com.axs.applekeyboardtheme
-Name: Apple Keyboard Custom Background
+Package: com.axs.keyboardcolor
+Name: Keyboard Color Tweak
 Version: 1.0
 Architecture: iphoneos-arm
-Description: Custom background for Apple Keyboard on Dopamine JB
-Maintainer: Your Name <your@email.com>
-Author: Your Name <your@email.com>
+Description: 自定义键盘颜色插件 - 支持 iOS 16 无根越狱
+Maintainer: Axs
+Author: Axs
 Section: Tweaks
-Depends: firmware (>= 16.0), org.coolstar.libhooker (>= 1.6.0)
+Depends: firmware (>= 16.0), preferenceloader (>= 2.2.4)
