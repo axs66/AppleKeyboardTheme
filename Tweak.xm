@@ -17,13 +17,6 @@
 
 - (void)viewDidLoad {
     %orig;
-    
-    [self applyKeyboardColor];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    %orig;
-    
     [self applyKeyboardColor];
 }
 
@@ -38,12 +31,12 @@
     
     UIColor *keyboardColor = [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
     
-    // 安全访问view属性
+    // 安全访问 view，避免使用 KVC
     UIView *controllerView = nil;
-    @try {
-        controllerView = [self valueForKey:@"view"];
-    } @catch (NSException *exception) {
-        NSLog(@"KeyboardColorTweak: Failed to access view - %@", exception);
+    if ([self respondsToSelector:@selector(view)]) {
+        controllerView = ((UIViewController *)self).view;
+    }
+    if (!controllerView) {
         return;
     }
     
@@ -53,18 +46,18 @@
             subview.backgroundColor = keyboardColor;
             
             // 递归设置子视图背景色
-            [self setBackgroundColor:keyboardColor forView:subview];
+            [self kct_applyBackgroundColor:keyboardColor toView:subview];
         }
     }
 }
 
-- (void)setBackgroundColor:(UIColor *)color forView:(UIView *)view {
+- (void)kct_applyBackgroundColor:(UIColor *)color toView:(UIView *)view {
     for (UIView *subview in view.subviews) {
         if ([subview isKindOfClass:NSClassFromString(@"UIKBKeyView")] || 
             [subview isKindOfClass:NSClassFromString(@"UIKBKeyplaneView")]) {
             subview.backgroundColor = color;
         }
-        [self setBackgroundColor:color forView:subview];
+        [self kct_applyBackgroundColor:color toView:subview];
     }
 }
 
