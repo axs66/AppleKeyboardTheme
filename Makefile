@@ -9,9 +9,9 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = KeyboardColorTweak
 
 KeyboardColorTweak_FILES = Tweak.xm
-KeyboardColorTweak_CFLAGS = -fobjc-arc
+KeyboardColorTweak_CFLAGS = -fobjc-arc -I/var/jb/System/Library/PrivateFrameworks/TextInputUI.framework/Headers
 KeyboardColorTweak_FRAMEWORKS = UIKit Foundation CoreGraphics
-KeyboardColorTweak_PRIVATE_FRAMEWORKS = Preferences TextInputUI
+KeyboardColorTweak_PRIVATE_FRAMEWORKS = Preferences TextInput TextInputUI
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 include $(THEOS_MAKE_PATH)/aggregate.mk
