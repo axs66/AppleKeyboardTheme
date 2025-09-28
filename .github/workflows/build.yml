@@ -57,6 +57,9 @@ jobs:
 
       - name: Build package
         run: |
+          pwd
+          ls -la
+          ls -la Preferences/
           rm -f ${{ github.workspace }}/packages/*.deb
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
           make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
