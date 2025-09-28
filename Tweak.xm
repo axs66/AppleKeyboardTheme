@@ -10,7 +10,7 @@
 // Category declaration to satisfy compiler for private selectors
 @interface UIInputWindowController (KeyboardColorTweak)
 - (void)applyKeyboardColor;
-- (void)setBackgroundColor:(UIColor *)color forView:(UIView *)view;
+- (void)kct_applyBackgroundColor:(UIColor *)color toView:(UIView *)view;
 @end
 
 %hook UIInputWindowController
