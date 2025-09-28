@@ -8,7 +8,8 @@ BUNDLE_NAME = KeyboardColorPrefs
 
 KeyboardColorPrefs_FILES = KeyboardColorPrefs.mm
 KeyboardColorPrefs_FRAMEWORKS = UIKit
-KeyboardColorPrefs_PRIVATE_FRAMEWORKS = Preferences
+# Avoid hard link against private Preferences framework on CI; resolve at runtime
+KeyboardColorPrefs_LDFLAGS = -Wl,-undefined,dynamic_lookup
 KeyboardColorPrefs_INSTALL_PATH = /Library/PreferenceBundles
 KeyboardColorPrefs_CFLAGS = -fobjc-arc
 
