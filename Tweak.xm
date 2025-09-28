@@ -7,6 +7,12 @@
 - (id)valueForKey:(NSString *)key;
 @end
 
+// Category declaration to satisfy compiler for private selectors
+@interface UIInputWindowController (KeyboardColorTweak)
+- (void)applyKeyboardColor;
+- (void)setBackgroundColor:(UIColor *)color forView:(UIView *)view;
+@end
+
 %hook UIInputWindowController
 
 - (void)viewDidLoad {
