@@ -2,15 +2,17 @@ ARCHS = arm64 arm64e
 TARGET := iphone:clang:latest:16.0
 THEOS_PACKAGE_SCHEME = rootless
 
+INSTALL_TARGET_PROCESSES = SpringBoard Preferences
+
 include $(THEOS)/makefiles/common.mk
 
-BUNDLE_NAME = KeyboardColorPrefs
+TWEAK_NAME = KeyboardColorTweak
 
-KeyboardColorPrefs_FILES = KeyboardColorPrefs.mm
-KeyboardColorPrefs_FRAMEWORKS = UIKit
-# Avoid hard link against private Preferences framework on CI; resolve at runtime
-KeyboardColorPrefs_LDFLAGS = -Wl,-undefined,dynamic_lookup
-KeyboardColorPrefs_INSTALL_PATH = /Library/PreferenceBundles
-KeyboardColorPrefs_CFLAGS = -fobjc-arc
+KeyboardColorTweak_FILES = Tweak.xm
+KeyboardColorTweak_CFLAGS = -fobjc-arc
+KeyboardColorTweak_FRAMEWORKS = UIKit Foundation CoreGraphics
 
-include $(THEOS_MAKE_PATH)/bundle.mk
+include $(THEOS_MAKE_PATH)/tweak.mk
+
+SUBPROJECTS += Preferences
+include $(THEOS_MAKE_PATH)/aggregate.mk
