@@ -1,11 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - main
-    tags-ignore:
-      - '*'  # 忽略 tag 推送触发，避免发布 release 时死循环构建
+
 
 jobs:
   build:
