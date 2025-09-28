@@ -1,9 +1,9 @@
 #import <UIKit/UIKit.h>
-#import <TextInputUI/TextInputUI.h>
+#import <TextInput/TextInput.h> // 替代TextInputUI导入
 
-%hook UIKBKeyplaneView
+%hook UIInputWindowController
 
-- (void)layoutSubviews {
+- (void)viewDidLoad {
     %orig;
     
     // 从偏好设置读取颜色
@@ -18,11 +18,9 @@
         keyboardColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
     }
     
-    self.backgroundColor = keyboardColor;
-    
-    // 修改按键颜色
-    for (UIView *subview in self.subviews) {
-        if ([subview isKindOfClass:NSClassFromString(@"UIKBKeyView")]) {
+    // 修改键盘背景颜色
+    for (UIView *subview in self.view.subviews) {
+        if ([subview isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
             subview.backgroundColor = keyboardColor;
         }
     }
