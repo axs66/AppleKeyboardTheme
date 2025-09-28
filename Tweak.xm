@@ -1,12 +1,11 @@
 #import <UIKit/UIKit.h>
-#import <TextInput/TextInput.h> // 替代TextInputUI导入
+#import <objc/runtime.h>
 
 %hook UIInputWindowController
 
 - (void)viewDidLoad {
     %orig;
     
-    // 从偏好设置读取颜色
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.yourcompany.keyboardcolor"];
     UIColor *keyboardColor = [UIColor colorWithRed:[[defaults objectForKey:@"red"] floatValue]
                                            green:[[defaults objectForKey:@"green"] floatValue]
@@ -14,12 +13,20 @@
                                            alpha:[[defaults objectForKey:@"alpha"] floatValue]];
     
     if (!keyboardColor) {
-        // 默认颜色（浅灰色）
         keyboardColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1.0];
     }
     
+    // 安全访问view属性
+    UIView *controllerView = nil;
+    @try {
+        controllerView = [self valueForKey:@"view"];
+    } @catch (NSException *exception) {
+        NSLog(@"KeyboardColorTweak: Failed to access view - %@", exception);
+        return;
+    }
+    
     // 修改键盘背景颜色
-    for (UIView *subview in self.view.subviews) {
+    for (UIView *subview in controllerView.subviews) {
         if ([subview isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
             subview.backgroundColor = keyboardColor;
         }
@@ -27,7 +34,3 @@
 }
 
 %end
-
-%ctor {
-    NSLog(@"KeyboardColorTweak loaded");
-}
