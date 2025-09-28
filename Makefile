@@ -11,7 +11,6 @@ TWEAK_NAME = KeyboardColorTweak
 KeyboardColorTweak_FILES = Tweak.xm
 KeyboardColorTweak_CFLAGS = -fobjc-arc
 KeyboardColorTweak_FRAMEWORKS = UIKit Foundation CoreGraphics
-KeyboardColorTweak_PRIVATE_FRAMEWORKS = TextInput TextInputUI
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
