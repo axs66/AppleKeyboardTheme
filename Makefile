@@ -1,11 +1,20 @@
 ARCHS = arm64 arm64e
-TARGET = iphone:clang:16.5:15.0
-THEOS_PACKAGE_INSTALLATION_PREFIX = /var/jb
+TARGET := iphone:clang:latest:15.0
+THEOS_PACKAGE_SCHEME = rootless
 
-AppleKeyboardTheme_FILES = Tweak.x
-AppleKeyboardTheme_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
-AppleKeyboardTheme_FRAMEWORKS = UIKit
-AppleKeyboardTheme_PRIVATE_FRAMEWORKS = UIKitCore  # 关键私有框架
+INSTALL_TARGET_PROCESSES = SpringBoard Preferences
 
 include $(THEOS)/makefiles/common.mk
+
+TWEAK_NAME = KeyboardColorTweak
+
+KeyboardColorTweak_FILES = Tweak.xm
+KeyboardColorTweak_CFLAGS = -fobjc-arc
+KeyboardColorTweak_FRAMEWORKS = UIKit Foundation CoreGraphics
+KeyboardColorTweak_PRIVATE_FRAMEWORKS = Preferences TextInputUI
+
 include $(THEOS_MAKE_PATH)/tweak.mk
+include $(THEOS_MAKE_PATH)/aggregate.mk
+
+SUBPROJECTS += Preferences
+include $(THEOS_MAKE_PATH)/aggregate.mk
