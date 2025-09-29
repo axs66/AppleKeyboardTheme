@@ -82,13 +82,10 @@ static inline UIColor *kct_currentKeyboardColor(BOOL *outEnabled) {
         return;
     }
     
-    // 修改键盘背景颜色
+    // 仅设置 Host 容器的背景色，避免覆盖按键
     for (UIView *subview in controllerView.subviews) {
         if ([subview isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
             subview.backgroundColor = enabled ? keyboardColor : nil;
-            
-            // 递归设置子视图背景色
-            [self kct_applyBackgroundColor:(enabled ? keyboardColor : nil) toView:subview];
         }
     }
 }
