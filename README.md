@@ -8,7 +8,8 @@
 - 支持红、绿、蓝和透明度调节
 - 在系统设置中提供设置面板
 - 支持 iOS 16 无根越狱环境
-- 实时预览颜色变化
+- 实时预览颜色变化（无需重启，滑动即生效）
+- 启用/禁用开关，随时还原系统样式
 
 ## 安装要求
 
@@ -28,7 +29,7 @@
 
 1. 安装插件后，在系统设置中找到"键盘颜色"选项
 2. 使用滑块调整红、绿、蓝和透明度值
-3. 设置会立即生效，无需重启
+3. 设置会立即生效，无需重启；如未刷新，可最小化键盘再唤起
 4. 点击"恢复默认设置"可重置所有颜色值
 
 ## 文件结构
@@ -50,7 +51,8 @@ KeyboardColorTweak/
 ## 技术实现
 
 - 使用 Logos 语法 hook `UIInputWindowController` 类
-- 通过 `NSUserDefaults` 存储用户设置
+- 通过 `NSUserDefaults`（App Group/套件名 `com.yourcompany.keyboardcolor`）存储设置
+- 滑块/开关通过 Darwin 通知 `com.yourcompany.keyboardcolor/ReloadPrefs` 实时刷新
 - 使用 `Preferences` 框架创建系统设置面板
 - 支持无根越狱的 `rootless` 打包方案
 
