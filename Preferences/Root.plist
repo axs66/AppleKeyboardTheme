@@ -90,7 +90,7 @@
             <key>cell</key>
             <string>PSSliderCell</string>
             <key>default</key>
-            <real>1.0</real>
+            <real>0.3</real>
             <key>defaults</key>
             <string>com.yourcompany.keyboardcolor</string>
             <key>key</key>
