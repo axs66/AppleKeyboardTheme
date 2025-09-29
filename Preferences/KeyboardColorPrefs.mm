@@ -12,14 +12,20 @@
 
 - (void)resetDefaults {
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"com.yourcompany.keyboardcolor"];
+    [defaults setObject:@(YES) forKey:@"enabled"];
     [defaults setObject:@(0.9) forKey:@"red"];
     [defaults setObject:@(0.9) forKey:@"green"];
     [defaults setObject:@(0.9) forKey:@"blue"];
     [defaults setObject:@(1.0) forKey:@"alpha"];
     [defaults synchronize];
-    
+
+    // Notify tweak for live refresh
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(),
+                                         CFSTR("com.yourcompany.keyboardcolor/ReloadPrefs"),
+                                         NULL, NULL, true);
+
     [self reloadSpecifiers];
-    
+
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"已重置"
                                                                    message:@"键盘颜色已恢复默认"
                                                             preferredStyle:UIAlertControllerStyleAlert];
