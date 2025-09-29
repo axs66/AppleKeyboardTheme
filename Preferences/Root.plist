@@ -14,6 +14,20 @@
         </dict>
         <dict>
             <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.yourcompany.keyboardcolor</string>
+            <key>key</key>
+            <string>enabled</string>
+            <key>label</key>
+            <string>启用插件</string>
+            <key>PostNotification</key>
+            <string>com.yourcompany.keyboardcolor/ReloadPrefs</string>
+        </dict>
+        <dict>
+            <key>cell</key>
             <string>PSSliderCell</string>
             <key>default</key>
             <real>0.9</real>
@@ -29,6 +43,8 @@
             <real>0</real>
             <key>showValue</key>
             <true/>
+            <key>PostNotification</key>
+            <string>com.yourcompany.keyboardcolor/ReloadPrefs</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -47,6 +63,8 @@
             <real>0</real>
             <key>showValue</key>
             <true/>
+            <key>PostNotification</key>
+            <string>com.yourcompany.keyboardcolor/ReloadPrefs</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -65,6 +83,8 @@
             <real>0</real>
             <key>showValue</key>
             <true/>
+            <key>PostNotification</key>
+            <string>com.yourcompany.keyboardcolor/ReloadPrefs</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -83,6 +103,8 @@
             <real>0</real>
             <key>showValue</key>
             <true/>
+            <key>PostNotification</key>
+            <string>com.yourcompany.keyboardcolor/ReloadPrefs</string>
         </dict>
         <dict>
             <key>cell</key>
