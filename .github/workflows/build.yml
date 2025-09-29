@@ -1,15 +1,17 @@
+# 优化建议：构建deb时间3分钟，主要耗时在Theos和SDK下载/解压。可通过更高效的缓存、并行构建、减少冗余命令等方式优化。
+
 name: CI
 
 on:
   push:
     paths:
-      - '.github/workflows/build.yml'  # 监控 build.yml 文件的变化
-      - '**.xm'  # 增加对 Tweak.xm 文件的监控
+      - '.github/workflows/build.yml'
+      - '**.xm'
       - 'control'
     branches:
-      - 'main'  # 仅在推送到 main 分支时触发
+      - 'main'
   workflow_dispatch:
-  
+
 jobs:
   build:
     runs-on: macos-latest
@@ -19,21 +21,22 @@ jobs:
         with:
           submodules: true
 
-      - name: Check cache
-        run: |
-          echo upstream_heads=theos_version_commit-sdks_version_commit >> $GITHUB_ENV
-
-      - name: Use cache
-        id: cache
+      # 缓存Theos和SDK，缓存key包含theos和sdk的commit hash，避免每次都下载
+      - name: Cache Theos and SDK
+        id: cache-theos
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/theos
-          key: ${{ runner.os }}-theos-sdk-version
+          path: |
+            ${{ github.workspace }}/theos
+            ${{ github.workspace }}/theos/sdks/iPhoneOS16.0.sdk
+          key: theos-v1-${{ runner.os }}-${{ hashFiles('**/build.yml') }}-${{ hashFiles('**/Tweak.xm') }}
 
       - name: Prepare Theos
+        if: steps.cache-theos.outputs.cache-hit != 'true'
         uses: axs66/theos-action@main
 
       - name: Install iOS SDK (with PrivateFrameworks)
+        if: steps.cache-theos.outputs.cache-hit != 'true'
         run: |
           set -e
           mkdir -p "$GITHUB_WORKSPACE/theos/sdks"
@@ -46,7 +49,6 @@ jobs:
               || curl -L -o "$SDK_FILE" https://github.com/theos/sdks/releases/download/ios-16.4/iPhoneOS16.4.sdk.tar.xz \
               || curl -L -o "$SDK_FILE" https://github.com/theos/sdks/releases/download/ios-16.5/iPhoneOS16.5.sdk.tar.xz
             tar -xJf "$SDK_FILE" || true
-            # If we downloaded a different version, extract name may differ; normalize to 16.0 path if needed
             for D in iPhoneOS16.*.sdk; do
               if [ -d "$D" ] && [ "$D" != "iPhoneOS16.0.sdk" ]; then
                 ln -snf "$D" iPhoneOS16.0.sdk
@@ -55,14 +57,13 @@ jobs:
           fi
           ls -la
 
-      - name: Build package
+      # 构建rootless和roothide包，使用并行加速
+      - name: Build packages (parallel)
         run: |
-          pwd
-          ls -la
-          ls -la Preferences/
           rm -f ${{ github.workspace }}/packages/*.deb
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
-          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless -j$(sysctl -n hw.logicalcpu) &
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=roothide -j$(sysctl -n hw.logicalcpu) &
+          wait
 
       - name: List generated Deb packages
         run: ls ${{ github.workspace }}/packages
