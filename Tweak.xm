@@ -95,9 +95,9 @@ static inline UIColor *kct_currentKeyboardColor(BOOL *outEnabled) {
 
 %new
 - (void)kct_applyBackgroundColor:(UIColor *)color toView:(UIView *)view {
+    // Only set container-level backgrounds; avoid painting key views to prevent overlay
     for (UIView *subview in view.subviews) {
-        if ([subview isKindOfClass:NSClassFromString(@"UIKBKeyView")] || 
-            [subview isKindOfClass:NSClassFromString(@"UIKBKeyplaneView")]) {
+        if ([subview isKindOfClass:NSClassFromString(@"UIInputSetHostView")]) {
             subview.backgroundColor = color;
         }
         [self kct_applyBackgroundColor:color toView:subview];
