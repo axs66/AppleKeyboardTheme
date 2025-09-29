@@ -5,7 +5,7 @@
     <key>entry</key>
     <dict>
         <key>bundle</key>
-        <string>com.yourcompany.keyboardcolor</string>
+        <string>com.axs.keyboardcolor</string>
         <key>cell</key>
         <string>PSLinkCell</string>
         <key>detail</key>
