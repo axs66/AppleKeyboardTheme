@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.yourcompany.keyboardcolor</string>
+    <string>com.axs.keyboardcolor</string>
     <key>CFBundleName</key>
     <string>Keyboard Color</string>
     <key>CFBundleDisplayName</key>
