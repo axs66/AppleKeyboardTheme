@@ -17,7 +17,7 @@
     [defaults setObject:@(0.9) forKey:@"red"];
     [defaults setObject:@(0.9) forKey:@"green"];
     [defaults setObject:@(0.9) forKey:@"blue"];
-    [defaults setObject:@(1.0) forKey:@"alpha"];
+    [defaults setObject:@(0.3) forKey:@"alpha"];
     [defaults synchronize];
 
     // Notify tweak for live refresh
