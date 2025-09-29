@@ -14,6 +14,8 @@
         <true/>
         <key>label</key>
         <string>键盘颜色</string>
+        <key>specifierPlist</key>
+        <string>Root</string>
     </dict>
 </dict>
 </plist>
