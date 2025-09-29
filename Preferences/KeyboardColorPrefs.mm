@@ -1,5 +1,6 @@
 #import "KeyboardColorPrefs.h"
 #import <UIKit/UIKit.h>
+#import <CoreFoundation/CoreFoundation.h>
 
 @implementation KeyboardColorPrefs
 
